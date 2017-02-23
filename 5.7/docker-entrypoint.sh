@@ -63,6 +63,13 @@ if [ "$1" = 'mysqld' -a -z "$wantHelp" -a "$(id -u)" = '0' ]; then
 	_check_config "$@"
 	DATADIR="$(_datadir "$@")"
 	mkdir -p "$DATADIR"
+	MYSQL_RAM=${MYSQL_RAM:-"0"}
+	MYSQL_RAM_SIZE=${MYSQL_RAM_SIZE:-"512"}
+	if [[ "$MYSQL_RAM" != "0" ]]; then
+			DATADIR="$(_datadir "$@")"
+			echo "Mounting MySQL with ${MYSQL_RAM_SIZE}MB of RAM."
+			mount -t tmpfs -o size="${MYSQL_RAM_SIZE}m" tmpfs $DATADIR
+	fi
 	chown -R mysql:mysql "$DATADIR"
 	exec gosu mysql "$BASH_SOURCE" "$@"
 fi
